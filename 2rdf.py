@@ -17,7 +17,7 @@ pnv = Namespace('https://w3id.org/pnv#')
 JSONFILE = 'repertorium_van_ambtsdragers.json'
 
 import sys
-sys.path.append("../..")
+sys.path.append("../amsterdam-corporate-group-portraits-rdf")
 
 from ga import *
 
@@ -242,7 +242,7 @@ def toRdf(filepath: str, target: str):
                 function, person, organizationSubEventDict, identifier)
             lifeEvents.append(functionEvent)
 
-        person.hasParticipation = lifeEvents
+        person.participatesIn = lifeEvents
 
     ## Organizations
     organizationResUri2label = dict()
@@ -270,7 +270,7 @@ def toRdf(filepath: str, target: str):
         for e in subEvents:
             e.subEventOf = organizationEvent
 
-        Organization(organization).hasParticipation = [organizationEvent
+        Organization(organization).participatesIn = [organizationEvent
                                                        ] + subEvents
 
     g.bind('foaf', foaf)

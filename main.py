@@ -147,7 +147,7 @@ def getPersons(url):
                 'deathDate': deathDate
             })
 
-        sleep(1)
+        sleep(.5)
 
     return persons
 
@@ -161,7 +161,6 @@ def getFunctions(url):
     functions = []
 
     # membership
-
     membershipDiv = soup.findAll('span', class_='functie')
     for md in membershipDiv:
 
@@ -178,19 +177,13 @@ def getFunctions(url):
         endDateDict = parseDate(endDate)
 
         earliestBeginTimeStamp = beginDateDict['hasEarliestBeginTimeStamp']
-        latestBeginTimeStamp = beginDateDict['hasLatestEndTimeStamp']
-        earliestEndTimeStamp = endDateDict['hasEarliestBeginTimeStamp']
-        latestEndTimeStamp = beginDateDict['hasLatestEndTimeStamp']
+        latestBeginTimeStamp = beginDateDict['hasLatestBeginTimeStamp']
+        earliestEndTimeStamp = endDateDict['hasEarliestEndTimeStamp']
+        latestEndTimeStamp = endDateDict['hasLatestEndTimeStamp']
 
-        if 'hasTimeStamp' in beginDateDict:
-            beginTimeStamp = beginDateDict['hasTimeStamp']
-        else:
-            beginTimeStamp = None
+        beginTimeStamp = beginDateDict.get('hasTimeStamp')
 
-        if 'hasTimeStamp' in endDateDict:
-            endTimeStamp = endDateDict['hasTimeStamp']
-        else:
-            endTimeStamp = None
+        endTimeStamp = endDateDict.get('hasTimeStamp')
 
         functions.append({
             'role': func,
@@ -244,19 +237,13 @@ def getFunctions(url):
         endDateDict = parseDate(endDate)
 
         earliestBeginTimeStamp = beginDateDict['hasEarliestBeginTimeStamp']
-        latestBeginTimeStamp = beginDateDict['hasLatestEndTimeStamp']
-        earliestEndTimeStamp = endDateDict['hasEarliestBeginTimeStamp']
-        latestEndTimeStamp = beginDateDict['hasLatestEndTimeStamp']
+        latestBeginTimeStamp = beginDateDict['hasLatestBeginTimeStamp']
+        earliestEndTimeStamp = endDateDict['hasEarliestEndTimeStamp']
+        latestEndTimeStamp = endDateDict['hasLatestEndTimeStamp']
 
-        if 'hasTimeStamp' in beginDateDict:
-            beginTimeStamp = beginDateDict['hasTimeStamp']
-        else:
-            beginTimeStamp = None
+        beginTimeStamp = beginDateDict.get('hasTimeStamp')
 
-        if 'hasTimeStamp' in endDateDict:
-            endTimeStamp = endDateDict['hasTimeStamp']
-        else:
-            endTimeStamp = None
+        endTimeStamp = endDateDict.get('hasTimeStamp')
 
         commentsDiv = funcDiv.findAll('p', class_='opmerkingen')
         if commentsDiv:
@@ -264,6 +251,7 @@ def getFunctions(url):
         else:
             comments = None
 
+        orguri = None
         atags = funcDiv.findAll('a')
         for a in atags:
             if a.get('class') == 'sortering':
@@ -274,8 +262,6 @@ def getFunctions(url):
                 if orguri.endswith('#'):
                     orguri = orguri[:-1]
                 break
-            else:
-                orguri = None
 
         functions.append({
             'role': func,
@@ -296,8 +282,11 @@ def getFunctions(url):
 
 
 def main():
+
+    # First, get basic person information from the overview pages
     persons = getPersons(URL)
 
+    # Second, get functions from the detailed pages
     for n, person in enumerate(persons, 1):
 
         print(f"Getting functions for {n}/{len(persons)}")
@@ -306,10 +295,12 @@ def main():
 
         person['functions'] = functions
 
-        sleep(0.8)
+        sleep(0.33)  # Be gentle
 
+    # Save!
     with open('repertorium_van_ambtsdragers.json', 'w') as outfile:
         json.dump(persons, outfile, indent=4)
+
     print("Done!")
 
 
